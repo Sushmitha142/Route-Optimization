@@ -1,0 +1,26 @@
+# Backend - FastAPI
+fastapi==0.104.0
+uvicorn[standard]==0.23.2
+
+# Data Science / ML
+numpy==1.26.4
+pandas==2.1.1
+scikit-learn==1.3.0
+scipy==1.12.1
+joblib==1.3.2
+
+tensorflow-intel==2.18.0
+keras==2.18.0
+h5py==3.9.0
+
+# Visualization / Misc
+matplotlib==3.8.0
+seaborn==0.12.3
+networkx==3.1
+
+# Optional for API testing / frontend integration
+python-multipart==0.0.6
+requests==2.32.0
+
+# Optional: for React frontend communication
+pydeck==0.8.1
