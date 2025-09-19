@@ -6,15 +6,16 @@ html {
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #6366f1, #60a5fa, #34d399);
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #22c55e 100%);
     min-height: 100vh;
+    color: #1f2937;
 }
 
 /* Main container */
 .route-container {
     max-width: 900px;
     margin: 50px auto;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     border-radius: 2rem;
     padding: 40px;
@@ -26,7 +27,7 @@ html {
 .route-container h1 {
     font-size: 3rem;
     font-weight: 800;
-    background: linear-gradient(to right, #4f46e5, #22d3ee);
+    background: linear-gradient(90deg, #4f46e5, #22d3ee);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -38,24 +39,38 @@ html {
 .route-container p {
     font-size: 1.2rem;
     margin-bottom: 30px;
-    color: #374151;
+    color: #4b5563;
 }
 
-/* Inputs and textarea */
+/* Input and textarea styling */
+.input-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
 .route-container input,
-.route-container textarea {
-    width: 100%;
+.route-container textarea,
+.route-container select {
+    width: calc(100% - 40px);
     padding: 15px 20px;
-    margin-bottom: 20px;
     font-size: 1rem;
     border-radius: 1rem;
     border: 1px solid #cbd5e1;
     outline: none;
     transition: all 0.3s ease;
+    background-color: #f9fafb;
 }
 
 .route-container input:focus,
-.route-container textarea:focus {
+.route-container textarea:focus,
+.route-container select:focus {
     border-color: #4f46e5;
     box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
 }
@@ -67,44 +82,95 @@ html {
     font-weight: bold;
     border: none;
     border-radius: 2rem;
-    background: linear-gradient(90deg, #4f46e5, #22d3ee, #10b981);
+    background: linear-gradient(90deg, #4f46e5, #22d3ee);
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .route-container button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Result Box */
+.route-container button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Result box */
 .result-box {
     margin-top: 30px;
     padding: 25px;
     border-radius: 1.5rem;
     background: linear-gradient(to right, #22d3ee, #34d399);
     color: #fff;
-    font-size: 1.8rem;
+    font-size: 1.2rem;
     font-weight: 600;
+    line-height: 1.6;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     animation: bounce 1s ease infinite alternate;
 }
 
-/* Bounce animation */
+.result-box div:first-child {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.result-box div {
+    margin: 5px 0;
+}
+
+/* Loading and error states */
+.loading-message {
+    color: #60a5fa;
+    text-align: center;
+    margin-top: 20px;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    color: #ef4444;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Graph container */
+.graph-container {
+    margin-top: 40px;
+    background-color: #fff;
+    border-radius: 1.5rem;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.graph-container h2 {
+    font-size: 1.8rem;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+/* Keyframes for animation */
 @keyframes bounce {
     0% {
         transform: translateY(0px);
     }
 
     100% {
-        transform: translateY(-10px);
+        transform: translateY(-5px);
     }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .route-container {
+        margin: 20px;
         padding: 30px;
     }
 
@@ -118,6 +184,25 @@ html {
     }
 
     .result-box {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
+        padding: 20px;
     }
+}
+/* New style for the graph image */
+.graph-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+}
+/* New styles for a side-by-side graph layout */
+.graph-images-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.graph-images-container .graph-container {
+    flex: 1; /* Makes the containers grow to fill the space */
+    min-width: 300px; /* Prevents containers from getting too small */
 }

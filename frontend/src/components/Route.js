@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Graph } from "react-d3-graph";
 import "../styles/routepage.css";
 
 function RoutePage() {
@@ -8,79 +7,74 @@ function RoutePage() {
     const [end, setEnd] = useState("");
     const [path, setPath] = useState(null);
     const [cost, setCost] = useState(null);
-    const [graphData, setGraphData] = useState({ nodes: [], links: [] });
-    const [algorithm, setAlgorithm] = useState("shortest_path"); // New state for algorithm choice
+    const [algorithm, setAlgorithm] = useState("shortest_path");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [originalGraphImage, setOriginalGraphImage] = useState(null);
+    const [optimizedGraphImage, setOptimizedGraphImage] = useState(null);
 
     const submit = async () => {
-        // Clear previous results and graph data
         setPath(null);
         setCost(null);
-        setGraphData({ nodes: [], links: [] });
+        setOriginalGraphImage(null);
+        setOptimizedGraphImage(null);
+        setError(null);
+        setIsLoading(true);
 
         const formattedEdges = edges.split(";").map(edge => {
             const [u, v, w] = edge.split(",");
             return [u.trim(), v.trim(), parseFloat(w)];
         });
 
-        // Use the selected algorithm to form the correct URL
         const url = `http://localhost:8000/predict/route_${algorithm}`;
 
         try {
+            // First, get the path and cost from the backend
             const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ edges: formattedEdges, start, end }),
             });
 
+            if (!res.ok) {
+                throw new Error(`Error: ${res.statusText}`);
+            }
+
             const data = await res.json();
-            // The new backend response has 'path' and 'cost' keys
             const newPath = Array.isArray(data.path) ? data.path : ["No path found"];
             setPath(newPath);
             setCost(data.cost);
 
-            // Prepare graph data for visualization
-            const nodesSet = new Set();
-            formattedEdges.forEach(([u, v]) => {
-                nodesSet.add(u);
-                nodesSet.add(v);
+            // Second, get the original graph image
+            const originalImageRes = await fetch("http://localhost:8000/graphs/visualize_full", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ edges: formattedEdges, path: [] }), // Pass an empty path
             });
-            const nodes = Array.from(nodesSet).map(node => ({
-                id: node,
-                color: newPath.includes(node) ? "#22d3ee" : "#888",
-            }));
-            const links = formattedEdges.map(([u, v, w]) => ({
-                source: u,
-                target: v,
-                color:
-                    newPath.includes(u) && newPath.includes(v) &&
-                        newPath.indexOf(v) - newPath.indexOf(u) === 1
-                        ? "#10b981"
-                        : "#999",
-                label: w.toString(),
-            }));
-            setGraphData({ nodes, links });
+            if (originalImageRes.ok) {
+                const imageBlob = await originalImageRes.blob();
+                setOriginalGraphImage(URL.createObjectURL(imageBlob));
+            }
+
+            // Third, get the optimized graph image
+            const optimizedImageRes = await fetch("http://localhost:8000/graphs/visualize", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ edges: formattedEdges, path: newPath }), // Pass the new path
+            });
+
+            if (optimizedImageRes.ok) {
+                const imageBlob = await optimizedImageRes.blob();
+                setOptimizedGraphImage(URL.createObjectURL(imageBlob));
+            }
+
         } catch (error) {
             console.error("Failed to fetch route:", error);
+            setError("Failed to get a result. Please check your network and input.");
             setPath(["Error finding path"]);
             setCost(null);
-        }
-    };
-
-    const myConfig = {
-        nodeHighlightBehavior: true,
-        node: {
-            color: "#888",
-            size: 400,
-            highlightStrokeColor: "#03f",
-        },
-        link: {
-            highlightColor: "#10b981",
-        },
-        directed: true,
-        height: 400,
-        width: 600,
-        d3: {
-            gravity: 100
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -96,6 +90,7 @@ function RoutePage() {
                 <textarea
                     placeholder="A,B,5; B,C,3; C,D,2"
                     onChange={(e) => setEdges(e.target.value)}
+                    value={edges}
                 />
             </div>
 
@@ -104,6 +99,7 @@ function RoutePage() {
                 <input
                     placeholder="Start Node"
                     onChange={(e) => setStart(e.target.value)}
+                    value={start}
                 />
             </div>
 
@@ -112,6 +108,7 @@ function RoutePage() {
                 <input
                     placeholder="End Node"
                     onChange={(e) => setEnd(e.target.value)}
+                    value={end}
                 />
             </div>
 
@@ -121,31 +118,42 @@ function RoutePage() {
                 <select onChange={(e) => setAlgorithm(e.target.value)} value={algorithm}>
                     <option value="shortest_path">Shortest Path</option>
                     <option value="with_time">With Time/Traffic</option>
+                    <option value="astar">A* Algorithm</option>
                 </select>
             </div>
 
             {/* Button */}
-            <button onClick={submit}>🚀 Optimize Route</button>
+            <button onClick={submit} disabled={isLoading}>
+                {isLoading ? "Optimizing..." : "🚀 Optimize Route"}
+            </button>
+
+            {/* Loading and Error States */}
+            {isLoading && <div className="loading-message">Optimizing route...</div>}
+            {error && <div className="error-message">{error}</div>}
 
             {/* Result */}
-            {path && (
+            {path && !isLoading && (
                 <div className="result-box">
                     <div>Best Path: {Array.isArray(path) ? path.join(" → ") : path}</div>
                     <div>Total Cost: {cost !== null ? cost : "N/A"}</div>
                 </div>
             )}
-
-            {/* Graph Visualization */}
-            {graphData.nodes.length > 0 && (
-                <div className="graph-container">
-                    <h2>Graph Visualization</h2>
-                    <Graph
-                        id="graph-id"
-                        data={graphData}
-                        config={myConfig}
-                    />
-                </div>
-            )}
+            
+            {/* Graph Visualizations */}
+            <div className="graph-images-container">
+                {originalGraphImage && (
+                    <div className="graph-container">
+                        <h2>Original Graph</h2>
+                        <img src={originalGraphImage} alt="Original Graph" className="graph-image" />
+                    </div>
+                )}
+                {optimizedGraphImage && (
+                    <div className="graph-container">
+                        <h2>Optimized Route</h2>
+                        <img src={optimizedGraphImage} alt="Optimized Route" className="graph-image" />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
