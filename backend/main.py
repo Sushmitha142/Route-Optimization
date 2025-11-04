@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from models.transport_model import optimize_route_shortest_path, optimize_route_with_time, optimize_route_astar
+from models.transport_model import optimize_route_shortest_path, optimize_route_astar
 
 app = FastAPI(title="Transportation & Logistics Analytics")
 
@@ -38,10 +38,7 @@ def route_shortest_path(data: RouteRequest):
     result = optimize_route_shortest_path(data.model_dump())
     return result
 
-@app.post("/predict/route_with_time")
-def route_with_time(data: RouteRequest):
-    result = optimize_route_with_time(data.model_dump())
-    return result
+# Removed /predict/route_with_time endpoint as time-weighted routing is no longer supported.
 
 @app.post("/predict/route_astar")
 def route_astar(data: RouteRequest):

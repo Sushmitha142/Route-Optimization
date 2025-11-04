@@ -6,9 +6,8 @@ This project is a web-based application designed to solve and visualize route op
 
 ### 🚀 Key Features
 
-  * **Multiple Optimization Algorithms**: The application provides three distinct algorithms to find the most efficient path between two nodes in a network:
+  * **Multiple Optimization Algorithms**: The application provides two algorithms to find the most efficient path between two nodes in a network:
       * **Shortest Path**: A standard algorithm that finds the path with the minimum total weight.
-      * **With Time/Traffic**: A modified algorithm that considers travel time, simulating factors like traffic.
       * **A\* (A-star)**: An advanced, heuristic-based algorithm that efficiently finds the shortest path, especially in large graphs.
   * **Case-Insensitive Input**: All node names are automatically converted to lowercase on the backend, ensuring that inputs like "A" and "a" are treated as the same node.
   * **Static Graph Visualization**: The application generates static images of both the original input graph and the optimized route using `matplotlib` and `NetworkX` on the backend, providing a clear visual comparison without frontend rendering issues.

@@ -117,7 +117,6 @@ function RoutePage() {
                 <label>Optimization Algorithm</label>
                 <select onChange={(e) => setAlgorithm(e.target.value)} value={algorithm}>
                     <option value="shortest_path">Shortest Path</option>
-                    <option value="with_time">With Time/Traffic</option>
                     <option value="astar">A* Algorithm</option>
                 </select>
             </div>

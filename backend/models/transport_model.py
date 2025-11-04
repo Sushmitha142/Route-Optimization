@@ -33,18 +33,7 @@ def optimize_route_shortest_path(data):
         return {"path": ["No path found"], "cost": None}
 
 
-def optimize_route_with_time(data):
-    G = nx.Graph()
-    edges = data.get("edges", [])
-    for u, v, w in edges:
-        time = w * 1.5
-        G.add_edge(u.lower(), v.lower(), weight=time)
-    start, end = data["start"].lower(), data["end"].lower()
-    try:
-        path = nx.shortest_path(G, source=start, target=end, weight="weight")
-        return {"path": path, "cost": nx.shortest_path_length(G, source=start, target=end, weight="weight")}
-    except nx.NetworkXNoPath:
-        return {"path": ["No path found"], "cost": None}
+# Removed time-weighted variant to keep only shortest path and A* as requested.
 
 def optimize_route_astar(data):
     G = nx.Graph()
