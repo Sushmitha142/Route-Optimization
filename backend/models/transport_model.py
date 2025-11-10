@@ -1,8 +1,4 @@
-import pandas as pd
 import networkx as nx
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestClassifier
-import joblib
 
 # ----------------------------
 # 1. Route Optimization
