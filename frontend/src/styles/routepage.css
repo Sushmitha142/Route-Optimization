@@ -171,21 +171,115 @@ html {
 @media (max-width: 768px) {
     .route-container {
         margin: 20px;
-        padding: 30px;
+        padding: 20px;
+        border-radius: 1.5rem;
     }
 
     .route-container h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
+    }
+
+    .route-container p {
+        font-size: 1rem;
+    }
+
+    .route-container input,
+    .route-container textarea,
+    .route-container select {
+        width: calc(100% - 30px);
+        padding: 12px 15px;
+        font-size: 0.95rem;
     }
 
     .route-container button {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         padding: 12px 30px;
+        width: 100%;
     }
 
     .result-box {
+        font-size: 1rem;
+        padding: 15px;
+    }
+
+    .result-box div:first-child {
         font-size: 1.2rem;
-        padding: 20px;
+    }
+
+    .graph-container h2 {
+        font-size: 1.4rem;
+    }
+
+    .graph-images-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .graph-images-container .graph-container {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .route-container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .route-container h1 {
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+    }
+
+    .route-container p {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
+    .input-group label {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    .route-container input,
+    .route-container textarea,
+    .route-container select {
+        width: calc(100% - 24px);
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .route-container textarea {
+        min-height: 80px;
+    }
+
+    .route-container button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+
+    .result-box {
+        font-size: 0.9rem;
+        padding: 12px;
+        margin-top: 20px;
+    }
+
+    .result-box div:first-child {
+        font-size: 1.1rem;
+    }
+
+    .graph-container {
+        margin-top: 20px;
+        padding: 15px;
+    }
+
+    .graph-container h2 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
     }
 }
 /* New style for the graph image */
