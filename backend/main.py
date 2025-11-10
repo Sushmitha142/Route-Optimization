@@ -14,13 +14,12 @@ from models.transport_model import optimize_route_shortest_path, optimize_route_
 
 app = FastAPI(title="Transportation & Logistics Analytics")
 
-# CORS configuration - allows requests from localhost and Render frontend
+# CORS configuration - allows requests from localhost and production frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
-        "https://*.onrender.com",  # Allows any Render frontend
-        "*"  # For development - restrict in production
+        "http://localhost:3000",  # Local development
+        "https://route-optimization-frontend-9nk5.onrender.com"  # Production frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],
