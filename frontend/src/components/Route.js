@@ -13,6 +13,9 @@ function RoutePage() {
     const [originalGraphImage, setOriginalGraphImage] = useState(null);
     const [optimizedGraphImage, setOptimizedGraphImage] = useState(null);
 
+    // API URL: Use environment variable if set, otherwise default to localhost
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
     const submit = async () => {
         setPath(null);
         setCost(null);
@@ -26,7 +29,7 @@ function RoutePage() {
             return [u.trim(), v.trim(), parseFloat(w)];
         });
 
-        const url = `http://localhost:8000/predict/route_${algorithm}`;
+        const url = `${API_URL}/predict/route_${algorithm}`;
 
         try {
             // First, get the path and cost from the backend
@@ -46,7 +49,7 @@ function RoutePage() {
             setCost(data.cost);
 
             // Second, get the original graph image
-            const originalImageRes = await fetch("http://localhost:8000/graphs/visualize_full", {
+            const originalImageRes = await fetch(`${API_URL}/graphs/visualize_full`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ edges: formattedEdges, path: [] }), // Pass an empty path
@@ -57,7 +60,7 @@ function RoutePage() {
             }
 
             // Third, get the optimized graph image
-            const optimizedImageRes = await fetch("http://localhost:8000/graphs/visualize", {
+            const optimizedImageRes = await fetch(`${API_URL}/graphs/visualize`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ edges: formattedEdges, path: newPath }), // Pass the new path
