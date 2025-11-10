@@ -14,9 +14,14 @@ from models.transport_model import optimize_route_shortest_path, optimize_route_
 
 app = FastAPI(title="Transportation & Logistics Analytics")
 
+# CORS configuration - allows requests from localhost and Render frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://*.onrender.com",  # Allows any Render frontend
+        "*"  # For development - restrict in production
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,6 +31,12 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "Transport API Running"}
+
+
+# Health endpoint for container/platform checks
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 # 1. Route Optimization
 class RouteRequest(BaseModel):

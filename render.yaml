@@ -1,0 +1,21 @@
+services:
+  # Backend API
+  - type: web
+    name: route-optimization-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: PORT
+        value: 8000
+    healthCheckPath: /health
+
+  # Frontend
+  - type: web
+    name: route-optimization-frontend
+    runtime: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npx serve -s build -l $PORT
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false

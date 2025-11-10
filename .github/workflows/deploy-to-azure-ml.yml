@@ -1,0 +1,72 @@
+name: CI - Build & Deploy to Azure ML
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  IMAGE_NAME: route-optimization
+  ACR_NAME: ${{ secrets.ACR_NAME }}
+  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  WORKSPACE_NAME: ${{ secrets.AZURE_ML_WORKSPACE }}
+  LOCATION: ${{ secrets.AZURE_LOCATION }}
+  ENDPOINT_NAME: routeopt-endpoint
+  DEPLOYMENT_NAME: routeopt-deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up variables
+        run: |
+          echo "ACR_LOGIN_SERVER=${{ secrets.ACR_NAME }}.azurecr.io" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Build backend image
+        working-directory: backend
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+
+      - name: Login to ACR
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Push image to ACR
+        run: |
+          docker push $ACR_LOGIN_SERVER/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+      - name: Ensure AML extension
+        run: |
+          az extension add -n ml-ai-tooling || true
+
+      - name: Create resource group (if missing)
+        run: |
+          az group create -n ${{ env.RESOURCE_GROUP }} -l ${{ env.LOCATION }} || true
+
+      - name: Create or get AML workspace
+        run: |
+          az ml workspace create -n ${{ env.WORKSPACE_NAME }} -g ${{ env.RESOURCE_GROUP }} -l ${{ env.LOCATION }} || true
+
+      - name: Create or update online endpoint
+        run: |
+          az ml online-endpoint create --name ${{ env.ENDPOINT_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --workspace-name ${{ env.WORKSPACE_NAME }} --auth-mode key --type managed || true
+
+      - name: Create online deployment
+        run: |
+          az ml online-deployment create --name ${{ env.DEPLOYMENT_NAME }} --endpoint-name ${{ env.ENDPOINT_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --workspace-name ${{ env.WORKSPACE_NAME }} --image $ACR_LOGIN_SERVER/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} --instance-type Standard_DS3_v2 --scale-settings "{'scale_to':1}" || true
+
+      - name: Route 100% traffic to deployment
+        run: |
+          az ml online-endpoint update --name ${{ env.ENDPOINT_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --workspace-name ${{ env.WORKSPACE_NAME }} --traffic "{\"${{ env.DEPLOYMENT_NAME }}\":100}"
+
+      - name: Get endpoint keys
+        run: |
+          az ml online-endpoint get-credentials --name ${{ env.ENDPOINT_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --workspace-name ${{ env.WORKSPACE_NAME }}
